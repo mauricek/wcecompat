@@ -63,15 +63,16 @@ void unicode2ascii(const WCHAR* unicode, char* ascii)
 
 void ascii2unicode(const char* ascii, WCHAR* unicode, int maxChars)
 {
+	int i = 0;
 	if (((unsigned int)unicode & 1) == 0)
 	{	// word-aligned
-		for (int i=0; ascii[i] != 0 && i<maxChars; i++)
+		for (i = 0; ascii[i] != 0 && i<maxChars; i++)
 			unicode[i] = ascii[i];
 		unicode[i] = 0;
 	}
 	else
 	{	// not word-aligned
-		for (int i=0; ascii[i] != 0 && i<maxChars; i++)
+		for (i = 0; ascii[i] != 0 && i<maxChars; i++)
 		{
 			*(char*)&unicode[i] = ascii[i];
 			*(((char*)&unicode[i])+1) = 0;
@@ -84,15 +85,16 @@ void ascii2unicode(const char* ascii, WCHAR* unicode, int maxChars)
 
 void unicode2ascii(const WCHAR* unicode, char* ascii, int maxChars)
 {
+	int i = 0;
 	if (((unsigned int)unicode & 1) == 0)
 	{	// word-aligned
-		for (int i=0; unicode[i] != 0 && i<maxChars; i++)
+		for (i = 0; unicode[i] != 0 && i<maxChars; i++)
 			ascii[i] = (char)unicode[i];
 		ascii[i] = 0;
 	}
 	else
 	{	// not word-aligned
-		for (int i=0; (*(char*)&unicode[i] != 0 || *(((char*)&unicode[i])+1) != 0) && i<maxChars; i++)
+		for (i = 0; (*(char*)&unicode[i] != 0 || *(((char*)&unicode[i])+1) != 0) && i<maxChars; i++)
 			ascii[i] = *(char*)&unicode[i];
 		ascii[i] = 0;
 	}

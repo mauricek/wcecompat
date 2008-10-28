@@ -26,7 +26,7 @@
 #include "internal.h"
 
 
-int stat(const char* filename, struct stat* st)
+int stat(const char* /*filename*/, struct stat* /*st*/)
 {
 #if 0
 	if (filename == NULL || st == NULL)

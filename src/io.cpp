@@ -24,7 +24,7 @@
 #include <errno.h>
 
 
-int access(const char* pathname, int mode)
+int access(const char* /*pathname*/, int /*mode*/)
 {
 //	if (fprintf(stderr, "NOT IMPLEMENTED: access(pathname=%s, mode=%d)\n", pathname, mode) <= 0)
 //		printf("NOT IMPLEMENTED: access(pathname=%s, mode=%d)\n", pathname, mode);
@@ -33,7 +33,7 @@ int access(const char* pathname, int mode)
 }
 
 
-int unlink(const char* pathname)
+int unlink(const char* /*pathname*/)
 {
 //	if (fprintf(stderr, "NOT IMPLEMENTED: unlink(pathname=%s)\n", pathname) <= 0)
 //		printf("NOT IMPLEMENTED: unlink(pathname=%s)\n", pathname);

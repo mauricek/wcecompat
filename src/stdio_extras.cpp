@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 #include <errno.h>
-
+#include <ceconfig.h>
 
 void perror(const char *prefix)
 {
@@ -32,8 +32,11 @@ void perror(const char *prefix)
 }
 
 
-int setvbuf(FILE* stream, char* buffer, int mode, size_t size)
+#if _WIN32_WCE < 0x500 || !defined(COREDLL_CORESTRA)
+int setvbuf(FILE* /*stream*/, char* /*buffer*/, int /*mode*/, size_t /*size*/)
 {
 	// TODO: implement buffering
 	return 0;
 }
+#endif
+

@@ -23,17 +23,16 @@
 #include "args.h"
 #include "redir.h"	// initStdHandles
 
-
 int main(int argc, char* argv[]);
 
 
 int
 WINAPI
 WinMain(
-	HINSTANCE hInstance,
-	HINSTANCE hPrevInstance,
+	HINSTANCE /*hInstance*/,
+	HINSTANCE /*hPrevInstance*/,
 	LPWSTR lpCmdLine,
-	int nShowCmd)
+	int /*nShowCmd*/)
 {
 	int		result;
 	int		argc;
@@ -42,7 +41,9 @@ WinMain(
 	// convert program name and lpCmdLine into argc/argv, and handle I/O redirection
 	argc = processCmdLine(lpCmdLine, &argv);
 
+#if _WIN32_WCE < 0x500 || !defined(COREDLL_CORESIOA)
 	initStdHandles();	// get environment variables from ChildData
+#endif
 
 	result = main(argc, (char**)argv);
 

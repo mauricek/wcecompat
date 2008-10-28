@@ -22,7 +22,7 @@
 #include <sys/timeb.h>
 
 
-int ftime(struct timeb* tp)
+int ftime(struct timeb* /*tp*/)
 {
 	// TODO: implement
 	return -1;

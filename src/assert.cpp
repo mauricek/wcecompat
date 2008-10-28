@@ -27,5 +27,5 @@
 void _assert(void* expression, void* file, unsigned line)
 {
 	fprintf(stderr, "Assertion failed: %s, file %s, line %d\n", (char*)expression, file, line);
-	abort();
+	exit(3);
 }

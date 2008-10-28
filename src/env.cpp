@@ -33,7 +33,9 @@ wchar_t**	_wenviron;
 
 char* getenv(const char* name)
 {
+#if _WIN32_WCE < 0x500 || !defined(COREDLL_CORESIOA)
 	initStdHandles();	// get environment variables from ChildData
+#endif
 	if (_environ == NULL)
 		return NULL;
 //	char** env = _environ;

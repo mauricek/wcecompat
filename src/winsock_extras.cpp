@@ -23,7 +23,7 @@
 #include <stdio.h>
 
 
-struct servent* PASCAL getservbyname(const char* name, const char* proto)
+struct servent* PASCAL getservbyname(const char* /*name*/, const char* /*proto*/)
 {
 //	if (fprintf(stderr, "NOT IMPLEMENTED: getservbyname(name=%s, proto=%s)\n", name, proto) <= 0)
 //		printf("NOT IMPLEMENTED: getservbyname(name=%s, proto=%s)\n", name, proto);

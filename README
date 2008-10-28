@@ -1,53 +1,55 @@
-wcecompat: Windows CE C Runtime Library "compatibility" library.
-Copyright (C) 2001-2005 Essemer Pty Ltd.  All rights reserved.
+wcecompat: Windows CE Runtime Library "compatibility" library.
 
+LICENSE
+-------
 This software is licensed under the terms and conditions in the LICENSE file.
 
-Contact: Steven Reddie (smr@essemer.com.au)
-         Essemer Pty Ltd
-         http://www.essemer.com.au/
+
+ABOUT
+-----
+This software is derived from the work by Steven Reddie from Essemer Pty Ltd.
+For contact information, see README_essemer.txt.
+As Essemer was not continuing this project it has been forked and republished.
+The new version is supposed to stay compatible with previous versions plus add
+support for Windows CE 5 and later.
 
 
-This is a work in progress.  You will no doubt find that the code here is a
-real mess at the moment, but it does work.  A cleaner version will be available
-shortly, keep an eye on the website.
-
-
-Building
---------
-
-To build, set the environment variables with one of the batch files installed
-with eVC, and then invoke nmake.
-
-Two libraries are built:
-
-* wcecompat.lib
-* wcecompatex.lib
-
-In this initial release, both libraries are identical and contain the
-functionality that is meant for wcecompatex.lib.  This library contains
-features to support stdin/stdout/stderr and their redirection.  The first
-library will in the future be a leaner library without these features.
-Whilst both libraries will be suitable for releasable applications it is
-assumed that some people will not want these extra features outside of
-debugging, and therefore the cutdown version will be provided.
-
-
-Todo
+NOTE
 ----
-
-Build a version that doesn't contain the stdin/stdout/stderr support.
-
-Finish and cleanup implementation of existing functions, particularly
-the stream IO.
+This is work in progress and the content might change at any point in time.
 
 
-Changes
--------
+REQUIREMENTS
+------------
+wcecompat requires the following software:
+- Perl (to create the makefile configuration)
+- Embedded Visual Studio 3/4 or Visual Studio 2005/following
+- A Windows CE SDK
 
-1.2    Add support for ARMV4T and ARMV4I to wcedefs.mak
 
-1.1    Changes to support eVC4 & Pocket PC 2003.
-       Added EAGAIN and ENOMEM to errno.h as needed by OpenSSL 0.9.8.
+BUILDING
+--------
+- Ensure your environment is setup for crosscompilation for the target Windows
+  CE platform. Refer to the documentation in case you are not sure how to do so.
+- Depending on your version of Windows CE, you will have to set some environment
+  variables. These are
+   * OSVERSION: A string composed by "WCE" plus the version number ,eg. WCE500
+                Note that eg. Windows Mobile 5 is based on Windows CE 5.01, so
+                be sure about the proper setting. Otherwise runtime issues might
+                occur.
+   * TARGETCPU: The CPU architecture the SDK is designed for (eg. X86, ARMV4I,...)
+   * PLATFORM : For Windows CE previous to 5.00 this might be needed, but is
+                deprecated from this version on.
+- Call 'perl config.pl' to create the makefile configuration for your setup. In case
+  you do not have perl available, continue reading below to create your own 
+  configuration without using perl.
+- Call 'nmake'
+- After successful compilation you will have "wcecompat.lib" and "wcecompatex.lib"
+  in your lib directory. These libraries are generated statically and are supposed
+  to be linked into your project.
 
-1.0    Initial release
+
+MANUAL MAKEFILE CONFIGURATION
+-----------------------------
+If Perl is not available, following steps are needed to build wcecompat successfully:
+- foo ### TODO:

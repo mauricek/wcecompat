@@ -28,7 +28,6 @@
 // Also, if redirection to files is handled by the process rather than the parent, then we need to make sure one
 // function is used otherwise different DLL's will overwrite each other's output to the files.
 
-
 #include "redir.h"
 #include <stdlib.h>
 #include <stdarg.h>
@@ -45,7 +44,8 @@
 #include <sys/stat.h>
 #include <conio.h>
 
-
+#include <ceconfig.h>
+#if _WIN32_WCE < 0x500 || !defined(COREDLL_CORESIOA)
 /*
 extern "C" void wcelog(const char* format, ...)
 {
@@ -536,8 +536,8 @@ bool initStdHandles()
 					// rwa	mode
 					// 010	"w"		w,   CREATE_ALWAYS					O_WRONLY				O_CREAT|O_TRUNC
 					// 011	"a"		w,   OPEN_ALWAYS   (APPEND DATA)	O_WRONLY	O_APPEND	O_CREAT
-					// 100	"r"		r,   OPEN_EXISTING					O_RDONLY				
-					// 110	"r+"	r/w, OPEN_EXISTING					O_RDWR					
+					// 100	"r"		r,   OPEN_EXISTING					O_RDONLY
+					// 110	"r+"	r/w, OPEN_EXISTING					O_RDWR
 					// 111	"a+"	r/w, OPEN_ALWAYS   (APPEND DATA)	O_RDWR		O_APPEND	O_CREAT
 					int	flags = 0;
 					int	mode = 0;
@@ -621,8 +621,8 @@ bool initStdHandles()
 					// rwa	mode
 					// 010	"w"		w,   CREATE_ALWAYS					O_WRONLY				O_CREAT|O_TRUNC
 					// 011	"a"		w,   OPEN_ALWAYS   (APPEND DATA)	O_WRONLY	O_APPEND	O_CREAT
-					// 100	"r"		r,   OPEN_EXISTING					O_RDONLY				
-					// 110	"r+"	r/w, OPEN_EXISTING					O_RDWR					
+					// 100	"r"		r,   OPEN_EXISTING					O_RDONLY
+					// 110	"r+"	r/w, OPEN_EXISTING					O_RDWR
 					// 111	"a+"	r/w, OPEN_ALWAYS   (APPEND DATA)	O_RDWR		O_APPEND	O_CREAT
 					int	flags = 0;
 					int	mode = 0;
@@ -717,8 +717,8 @@ bool initStdHandles()
 					// rwa	mode
 					// 010	"w"		w,   CREATE_ALWAYS					O_WRONLY				O_CREAT|O_TRUNC
 					// 011	"a"		w,   OPEN_ALWAYS   (APPEND DATA)	O_WRONLY	O_APPEND	O_CREAT
-					// 100	"r"		r,   OPEN_EXISTING					O_RDONLY				
-					// 110	"r+"	r/w, OPEN_EXISTING					O_RDWR					
+					// 100	"r"		r,   OPEN_EXISTING					O_RDONLY
+					// 110	"r+"	r/w, OPEN_EXISTING					O_RDWR
 					// 111	"a+"	r/w, OPEN_ALWAYS   (APPEND DATA)	O_RDWR		O_APPEND	O_CREAT
 					int	flags = 0;
 					int	mode = 0;
@@ -1107,7 +1107,6 @@ cleanup:
 
 int read(int fd, void* buffer, unsigned int count)
 {
-	bool		result = false;
 	_FD_STRUCT*	fds;
 	DWORD		numRead;
 
@@ -1160,7 +1159,6 @@ size_t fread(void* buffer, size_t size, size_t count, FILE* stream)
 
 int write(int fd, const void* buffer, unsigned int count)
 {
-	bool		result = false;
 	_FD_STRUCT*	fds;
 	DWORD		numWritten;
 
@@ -1181,9 +1179,11 @@ int write(int fd, const void* buffer, unsigned int count)
 			unsigned char	header[5];
 			header[0] = fds->pipeChannel;
 			memcpy(&header[1], &length, sizeof(length));
-			int x = pipeWrite(fds->pipe, header, sizeof(header));
+			/*int x = */
+			pipeWrite(fds->pipe, header, sizeof(header));
 		}
-		int x = pipeWrite(fds->pipe, (unsigned char*)buffer, count);
+		/*int x =*/
+		pipeWrite(fds->pipe, (unsigned char*)buffer, count);
 		numWritten = count;
 	}
 	else if (fds->hFile != INVALID_HANDLE_VALUE)
@@ -1352,7 +1352,6 @@ cleanup:
 long _lseek(int fd, long offset, int whence)
 {
 	bool		result = false;
-	int			_errno = EBADF;
 	_FD_STRUCT*	fds;
 	DWORD		dwMoveMethod;
 	DWORD		newPos;
@@ -1547,7 +1546,7 @@ int ungetc(int c, FILE* stream)
 	return result;
 }
 
-int fscanf(FILE* stream, const char* format, ...)
+int fscanf(FILE* /*stream*/, const char* /*format*/, ...)
 {
 //	if (fprintf(stderr, "NOT IMPLEMENTED: fscanf(stream=%p, format=\"%s\")\n", stream, format) <= 0)
 //		printf("NOT IMPLEMENTED: fscanf(stream=%p, format=\"%s\")\n", stream, format);
@@ -1577,49 +1576,49 @@ int fprintf(FILE* stream, const char* format, ...)
 	return result;
 }
 
-FILE* _wfdopen(void* handle, const wchar_t* mode)
+FILE* _wfdopen(void* /*handle*/, const wchar_t* /*mode*/)
 {
 //	if (fprintf(stderr, "NOT IMPLEMENTED: _wfdopen(handle=%p, mode=\"%s\")\n", handle, mode) <= 0)
 //		printf("NOT IMPLEMENTED: _wfdopen(handle=%p, mode=\"%s\")\n", handle, mode);
 	return NULL;
 }
 
-FILE* _wfreopen(const wchar_t* path, const wchar_t* mode, FILE* stream)
+FILE* _wfreopen(const wchar_t* /*path*/, const wchar_t* /*mode*/, FILE* /*stream*/)
 {
 //	if (fprintf(stderr, "NOT IMPLEMENTED: _wfreopen(path=\"%s\", mode=\"%s\", stream=%p)\n", path, mode, stream) <= 0)
 //		printf("NOT IMPLEMENTED: _wfreopen(path=\"%s\", mode=\"%s\", stream=%p)\n", path, mode, stream);
 	return NULL;
 }
 
-wint_t fgetwc(FILE* stream)
+wint_t fgetwc(FILE* /*stream*/)
 {
 //	if (fprintf(stderr, "NOT IMPLEMENTED: fgetwc(stream=%p)\n", stream) <= 0)
 //		printf("NOT IMPLEMENTED: fgetwc(stream=%p)\n", stream);
 	return WEOF;
 }
 
-wint_t fputwc(wint_t ch, FILE* stream)
+wint_t fputwc(wint_t /*ch*/, FILE* /*stream*/)
 {
 //	if (fprintf(stderr, "NOT IMPLEMENTED: fputwc(ch='%c', stream=%p)\n", ch, stream) <= 0)
 //		printf("NOT IMPLEMENTED: fputwc(ch='%c', stream=%p)\n", ch, stream);
 	return WEOF;
 }
 
-wint_t ungetwc(wint_t ch, FILE* stream)
+wint_t ungetwc(wint_t /*ch*/, FILE* /*stream*/)
 {
 //	if (fprintf(stderr, "NOT IMPLEMENTED: ungetwc(ch='%c', stream=%p)\n", ch, stream) <= 0)
 //		printf("NOT IMPLEMENTED: ungetwc(ch='%c', stream=%p)\n", ch, stream);
 	return WEOF;
 }
 
-wchar_t* fgetws(wchar_t* string, int n, FILE* stream)
+wchar_t* fgetws(wchar_t* /*string*/, int /*n*/, FILE* /*stream*/)
 {
 //	if (fprintf(stderr, "NOT IMPLEMENTED: fgetws(string=\"%s\", n=%d, stream=%p)\n", string, n, stream) <= 0)
 //		printf("NOT IMPLEMENTED: fgetws(string=\"%s\", n=%d, stream=%p)\n", string, n, stream);
 	return NULL;
 }
 
-int fputws(const wchar_t* string, FILE* stream)
+int fputws(const wchar_t* /*string*/, FILE* /*stream*/)
 {
 //	if (fprintf(stderr, "NOT IMPLEMENTED: fputws(string=\"%s\", stream=%p)\n", string, stream) <= 0)
 //		printf("NOT IMPLEMENTED: fputws(string=\"%s\", stream=%p)\n", string, stream);
@@ -1635,21 +1634,21 @@ FILE* _wfopen(const wchar_t* filename, const wchar_t* mode)
 	return fopen(filenameA, modeA);
 }
 
-int fwscanf(FILE* stream, const wchar_t* format, ...)
+int fwscanf(FILE* /*stream*/, const wchar_t* /*format*/, ...)
 {
 //	if (fprintf(stderr, "NOT IMPLEMENTED: fwscanf(stream=%p, format=\"%s\")\n", stream, format) <= 0)
 //		printf("NOT IMPLEMENTED: fwscanf(stream=%p, format=\"%s\")\n", stream, format);
 	return WEOF;
 }
 
-int fwprintf(FILE* stream, const wchar_t* format, ...)
+int fwprintf(FILE* /*stream*/, const wchar_t* /*format*/, ...)
 {
 //	if (fprintf(stderr, "NOT IMPLEMENTED: fwprintf(stream=%p, format=\"%s\")\n", stream, format) <= 0)
 //		printf("NOT IMPLEMENTED: fwprintf(stream=%p, format=\"%s\")\n", stream, format);
 	return -1;
 }
 
-int vfwprintf(FILE* stream, const wchar_t* format, va_list argptr)
+int vfwprintf(FILE* /*stream*/, const wchar_t* /*format*/, va_list /*argptr*/)
 {
 //	if (fprintf(stderr, "NOT IMPLEMENTED: vfwprintf(stream=%p, format=\"%s\")\n", stream, format) <= 0)
 //		printf("NOT IMPLEMENTED: vfwprintf(stream=%p, format=\"%s\")\n", stream, format);
@@ -1667,3 +1666,33 @@ int printf(const char *format, ...)
 
 	return result;
 }
+
+#else
+
+int read(int, void*, unsigned int)
+{
+	errno = EBADF;
+	return -1;
+}
+
+int write(int, const void*, unsigned int)
+{
+    errno = EBADF;
+    return -1;
+}
+
+int close(int)
+{
+    return 0;
+}
+
+long _lseek(int, long, int)
+{
+    return -1;
+}
+
+int _kbhit(void)
+{
+    return 0;
+}
+#endif

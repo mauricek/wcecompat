@@ -1,0 +1,10 @@
+Makefile.Debug
+Makefile.Release
+debug/*
+vc80.pdb
+release/*
+wceconfig.mak
+lib/*
+obj/*
+tmp/*
+

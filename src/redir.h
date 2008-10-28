@@ -22,6 +22,9 @@
 #ifndef __wcecompat__redir_h__
 #define __wcecompat__redir_h__
 
+#include <ceconfig.h>
+#if _WIN32_WCE < 0x500 || !defined(COREDLL_CORESIOA)
+
 
 #include "pipe.h"
 
@@ -34,5 +37,6 @@ extern	Pipe*	stdinPipe;
 // returns true only if pipes have been initialised successfully
 bool initStdHandles();
 
+#endif // COREDLL_CORESIOA
 
 #endif /* __wcecompat__redir_h__ */
