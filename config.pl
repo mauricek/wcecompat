@@ -44,7 +44,7 @@ elsif ($target_cpu eq "SH3") {
 elsif ($target_cpu eq "SH4") {
 		$compile_flags.= " -DSH4 -D_SH4_ -DSHx";
 		}
-elsif ($target_cpu eq "R4100" || $target_cpu eq "R4111" || $target_cpu eq "R4300") {
+elsif ($target_cpu eq "R4100" || $target_cpu eq "R4111" || $target_cpu eq "R4300" || $target_cpu eq "MIPSII" || $target_cpu eq "MIPSIV") {
 		$compile_flags.= " -DMIPS -D_MIPS_ -DMIPS_R4000";
 		}
 elsif ($target_cpu eq "ARMV4" || $target_cpu eq "ARMV4T" || $target_cpu eq "ARMV4I") {
@@ -60,6 +60,8 @@ elsif ($target_cpu eq "ARMV4" || $target_cpu eq "ARMV4T" || $target_cpu eq "ARMV
 # We need to set the machine type for the link flag
 if ($link_target_cpu eq "X86" && $wince_major_version < 5) {
 	$link_target_cpu = "IX86";
+} elsif ($link_target_cpu eq "MIPSII" || $link_target_cpu eq "MIPSIV") {
+	$link_target_cpu = "MIPS";
 }
 $link_flags.= " /MACHINE:".$link_target_cpu;
 
