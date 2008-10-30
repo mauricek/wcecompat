@@ -25,7 +25,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#if 0
 /* Define _CRTAPI1 (for compatibility with the NT SDK) */
 #ifndef _CRTAPI1
 #if     _MSC_VER >= 800 && _M_IX86 >= 300
@@ -43,7 +43,7 @@ extern "C" {
 #define _CRTAPI2
 #endif
 #endif
-
+#endif
 #ifndef _CRTIMP
 #define _CRTIMP
 #endif
@@ -77,7 +77,9 @@ typedef unsigned long  time_t;
 #endif
 #endif
 
+#ifndef offsetof
 #define offsetof(s,m) ((size_t)&(((s*)0)->m))
+#endif
 
 #ifdef __cplusplus
 }

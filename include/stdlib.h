@@ -25,10 +25,17 @@
 #include "stddef.h"
 #include "malloc.h"
 #include "memory.h"
+#include "float.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+extern float ceilf(float);  /* inside default stdlib.h */
+extern float fabsf(float);
+extern float floorf(float);
+extern float sqrtf(float);
+extern float fmodf(float);
 
 extern int _fmode;          /* default file translation mode */
 

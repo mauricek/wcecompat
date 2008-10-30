@@ -29,13 +29,25 @@ extern "C" {
 
 
 extern int errno;
-
+#ifndef ENOENT
 #define ENOENT	(2)
-#define EBADF	(9)
-#define EAGAIN	(11)
-#define ENOMEM	(12)
-#define EINVAL	(22)
+#endif
 
+#ifndef EBADF
+#define EBADF	(9)
+#endif
+
+#ifndef EAGAIN
+#define EAGAIN	(11)
+#endif
+
+#ifndef ENOMEM
+#define ENOMEM	(12)
+#endif
+
+#ifndef EINVAL
+#define EINVAL	(22)
+#endif
 
 #ifdef __cplusplus
 }

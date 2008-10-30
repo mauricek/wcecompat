@@ -23,6 +23,7 @@
 #define __wcecompat__STRING_H__
 
 #include "stddef.h"
+#include "memory.h"
 
 #ifdef __cplusplus
 extern "C" {

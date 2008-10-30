@@ -22,6 +22,8 @@
 #ifndef __wcecompat__ASSERT_H__
 #define __wcecompat__ASSERT_H__
 
+#include <ceconfig.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,7 +33,11 @@ extern "C" {
 #ifdef NDEBUG
 #define assert(exp) ((void)0)
 #else
+#ifndef COREDLL_CORESIOA
 void _assert(void*, void*, unsigned);
+#else
+#define _assert(exp,file,line) fprintf(stderr, "Assertion failed: %s, file %s, line %d\n", (char*)exp, file, line)
+#endif
 #define assert(exp) (void)( (exp) || (_assert(#exp, __FILE__, __LINE__), 0) )
 #endif
 

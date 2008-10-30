@@ -157,9 +157,15 @@ _CRTIMP int __cdecl vfwprintf(FILE *, const wchar_t *, va_list);
 
 void perror(const char *prefix);
 
+#ifndef _IOFBF
 #define _IOFBF	0
+#endif
+#ifndef _IOLBF
 #define _IOLBF	1
+#endif
+#ifndef _IONBF
 #define _IONBF	2
+#endif
 int setvbuf(FILE* stream, char* buffer, int mode, size_t size);
 
 #ifdef __cplusplus

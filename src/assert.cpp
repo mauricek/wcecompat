@@ -23,9 +23,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
+#ifndef COREDLL_CORESIOA
 void _assert(void* expression, void* file, unsigned line)
 {
 	fprintf(stderr, "Assertion failed: %s, file %s, line %d\n", (char*)expression, file, line);
 	exit(3);
 }
+#endif
