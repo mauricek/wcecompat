@@ -35,7 +35,9 @@ extern float ceilf(float);  /* inside default stdlib.h */
 extern float fabsf(float);
 extern float floorf(float);
 extern float sqrtf(float);
+#ifdef _X86_
 extern float fmodf(float);
+#endif
 
 extern int _fmode;          /* default file translation mode */
 
