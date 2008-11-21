@@ -60,9 +60,9 @@ typedef unsigned short _ino_t;
 #define _INO_T_DEFINED
 #endif
 
-#ifndef _OFF_T_DEFINED
+#ifndef __OFF_T_DEFINED
 typedef long _off_t;
-#define _OFF_T_DEFINED
+#define __OFF_T_DEFINED
 #endif
 
 struct stat

@@ -1695,4 +1695,15 @@ int _kbhit(void)
 {
     return 0;
 }
+
+int _open(const char*, int, int)
+{
+    return -1;
+}
+
 #endif
+
+FILE* fdopen(int, const char*)
+{
+    return NULL;
+}

@@ -27,6 +27,9 @@
 typedef unsigned int size_t;
 #define _SIZE_T_DEFINED
 #endif
-
+#ifndef _OFF_T_DEFINED
+typedef long off_t;
+#define _OFF_T_DEFINED
+#endif
 
 #endif // __wcecompat__SYS__TYPES_H__
