@@ -24,52 +24,74 @@
 #include <errno.h>
 #include "ts_string.h"
 #include "internal.h"
+#include <sys/timeb.h>
 
-
-int stat(const char* /*filename*/, struct stat* /*st*/)
+/* Very limited implementation of stat. Used by UI.C, MEMORY-P.C (latter is not critical) */
+int stat(const char *fname, struct stat *ss)
 {
-#if 0
-	if (filename == NULL || st == NULL)
-	{
-		errno = EINVAL;
+	TCHAR fnameUnc[MAX_PATH+1];
+	HANDLE handle;
+	WIN32_FIND_DATA wfd;
+	int len;
+
+	if(fname == NULL || ss == NULL)
 		return -1;
+
+	/* Special case (dummy on WinCE) */
+	len = strlen(fname);
+	if(len >= 2 && fname[len-1] == '.' && fname[len-2] == '.' &&
+		(len == 2 || fname[len-3] == '\\'))
+	{
+		/* That's everything implemented so far */
+		memset(ss, 0, sizeof(struct stat));
+		ss->st_size = 1024;
+		ss->st_mode |= S_IFDIR;
+		return 0;
 	}
 
-	TCHAR	filenameT[1000];
-	ts_strcpy(filenameT, filename);
-	WIN32_FILE_ATTRIBUTE_DATA	fad;
-	if (!GetFileAttributesEx(filenameT, GetFileExInfoStandard, (LPVOID)&fad))
+	MultiByteToWideChar(CP_ACP, 0, fname, -1, fnameUnc, MAX_PATH);
+	handle = FindFirstFile(fnameUnc, &wfd);
+	if(handle == INVALID_HANDLE_VALUE)
 	{
 		errno = ENOENT;
-		return -1;
-	}
-
-	st->st_dev = 0;
-	st->st_ino = 0;
-	st->st_mode = 0;
-	if (fad.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-	{
-		st->st_mode |= _S_IFDIR;
-		st->st_mode |= _S_IEXEC;	// search permission
+		return ENOENT;
 	}
 	else
 	{
-		st->st_mode |= _S_IFREG;
-		if (strlen(filename) >= 4 && _stricmp(filename+strlen(filename)-4, ".exe") == 0)
-			st->st_mode |= _S_IEXEC;	// execute permission
-	}
-	st->st_mode |= _S_IREAD;	// TODO: assuming readable, but this may not be the case
-	if (!(fad.dwFileAttributes & FILE_ATTRIBUTE_READONLY))
-		st->st_mode |= _S_IWRITE;
-	st->st_nlink = 1;	// TODO: NTFS can have links, so get the correct value
-	st->st_uid = 0;
-	st->st_gid = 0;
-	st->st_rdev = 0;
-	st->st_size = fad.nFileSizeLow;
-	st->st_atime = w32_filetime_to_time_t(&fad.ftLastAccessTime);
-	st->st_mtime = w32_filetime_to_time_t(&fad.ftLastWriteTime);
-	st->st_ctime = w32_filetime_to_time_t(&fad.ftCreationTime);
+		/* That's everything implemented so far */
+		memset(ss, 0, sizeof(struct stat));
+		ss->st_size = wfd.nFileSizeLow;
+		if(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			ss->st_mode |= S_IFDIR;
+		else
+			ss->st_mode |= S_IFREG;
 
-#endif
+		FindClose(handle);
+	}
 	return 0;
 }
+
+int fstat(int file, struct stat *sbuf)
+{
+	/* GetFileSize & GetFileTime */
+	DWORD dwSize;
+	FILETIME ctime, atime, mtime;
+
+	dwSize = GetFileSize( (HANDLE)file, NULL );
+	if( dwSize == 0xFFFFFFFF )
+		return -1;
+
+	sbuf->st_size = dwSize;
+	sbuf->st_dev  = 0;
+	sbuf->st_rdev = 0;
+	sbuf->st_mode = _S_IFREG;
+	sbuf->st_nlink= 1;
+
+	GetFileTime( (HANDLE)file, &ctime, &atime, &mtime );
+	sbuf->st_ctime = wce_FILETIME2time_t(&ctime);
+	sbuf->st_atime = wce_FILETIME2time_t(&atime);
+	sbuf->st_mtime = wce_FILETIME2time_t(&mtime);
+
+	return 0;
+}
+

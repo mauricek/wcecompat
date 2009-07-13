@@ -22,7 +22,7 @@
 #ifndef __wcecompat__PROCESS_H__
 #define __wcecompat__PROCESS_H__
 
-
+#include <winsock2.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,6 +31,25 @@ extern "C" {
 int __cdecl _getpid(void);
 #define getpid _getpid
 
+__inline unsigned long _beginthreadex( void *security, unsigned stack_size, void* start_address , void *arglist, unsigned initflag, unsigned *thrdaddr ) 
+{
+	return (unsigned long) CreateThread( (SECURITY_ATTRIBUTES*)security, stack_size, (LPTHREAD_START_ROUTINE)start_address,arglist,initflag,(DWORD*)thrdaddr);
+}
+
+__inline unsigned long _beginthread( void*start_address , unsigned stack_size, void *arglist) 
+{
+	return _beginthreadex(NULL,stack_size,start_address,arglist,0,NULL);
+}
+
+__inline void _endthreadex (unsigned long retval)
+{
+	ExitThread(retval);
+}
+
+__inline void _endthread ()
+{
+	_endthreadex(0);
+}
 
 #ifdef __cplusplus
 }

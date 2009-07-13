@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 
-#include <winsock.h>
+#include <winsock2.h>
 
 struct servent* PASCAL getservbyname(const char* name, const char* proto);
 

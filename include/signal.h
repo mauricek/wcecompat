@@ -22,5 +22,19 @@
 #ifndef __wcecompat__SIGNAL_H__
 #define __wcecompat__SIGNAL_H__
 
+#ifndef sig_atomic_t
+#define sig_atomic_t char
+#endif
+
+#ifndef NSIG
+#define NSIG 50
+#endif
+
+typedef void(* sighandler_t)(int);
+
+#ifndef SIG_ERR
+#define SIG_ERR (sighandler_t)-1
+#endif
+
 
 #endif // __wcecompat__SIGNAL_H__

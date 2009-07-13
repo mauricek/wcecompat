@@ -133,6 +133,8 @@ typedef struct _ldiv_t {
 div_t  __cdecl div(int, int);
 ldiv_t __cdecl ldiv(long, long);
 
+unsigned __int64 _strtoui64(const char *nptr, char **endptr, int base);
+
 #ifdef __cplusplus
 }
 #endif

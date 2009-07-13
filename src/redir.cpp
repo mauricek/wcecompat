@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <errno.h>
-#include <windows.h>
+#include <winsock2.h>
 #include <stdio.h>
 #include <tchar.h>
 #include "ts_string.h"

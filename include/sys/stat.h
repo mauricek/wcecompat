@@ -82,7 +82,7 @@ struct stat
 
 
 int __cdecl stat(const char *filename, struct stat *buf);
-
+int fstat(int file, struct stat *sbuf);
 
 #ifdef __cplusplus
 }

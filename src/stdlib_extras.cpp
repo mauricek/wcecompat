@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
-
+#include <ctype.h>
 
 int _fmode;		/* default file translation mode */
 
@@ -46,3 +46,33 @@ void* bsearch(const void* key, const void* base, size_t nmemb, size_t size,
 
 	return NULL;
 }
+
+unsigned __int64 _strtoui64(const char *nptr, char **endptr, int base)
+{
+	unsigned __int64 v=0;
+
+	while(isspace(*nptr)) ++nptr;
+
+	if (*nptr == '+') ++nptr;
+	if (!base) {
+		if (*nptr=='0') {
+			base=8;
+			if ((*(nptr+1)=='x')||(*(nptr+1)=='X')) {
+				nptr+=2;
+				base=16;
+			}
+		}
+		else
+			base=10;
+	}
+	while(*nptr) {
+		register unsigned char c=*nptr;
+		c=(c>='a'?c-'a'+10:c>='A'?c-'A'+10:c-'0');
+		if (c>=base) break;
+		v=v*base+c;
+		++nptr;
+	}
+	if (endptr) *endptr=(char *)nptr;
+	return v;
+}
+

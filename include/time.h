@@ -40,6 +40,10 @@ typedef unsigned long clock_t;
 #define CLOCKS_PER_SEC (1000)
 #endif
 
+#ifndef DAYSPERWEEK
+#define DAYSPERWEEK 7
+#endif
+
 time_t time(time_t* t);
 clock_t __cdecl clock(void);
 
@@ -61,6 +65,14 @@ struct tm
 
 struct tm* localtime(const time_t* clock);
 struct tm * __cdecl gmtime(const time_t *clock);
+size_t strftime(char *s, size_t maxs, const char *f, const struct tm *t);
+time_t mktime(struct tm* pt);
+
+void _tzset ();
+
+#define tzset _tzset;
+#define timegm mktime
+
 #ifdef __cplusplus
 }
 #endif

@@ -8,19 +8,22 @@ SRC =							\
 	src/ChildData.cpp			\
 	src/env.cpp					\
 	src/errno.cpp				\
-	src/io.cpp					\
+	src/io.c						\
 	src/pipe.cpp				\
 	src/process.cpp				\
-	src/redir.cpp				\
+#	src/redir.cpp				\
 	src/stat.cpp				\
 	src/stdio_extras.cpp		\
-	src/stdlib_extras.cpp		\
+	src/stdlib_extras.cpp	\
 	src/string_extras.cpp		\
-	src/time.cpp				\
+	src/time.c				\
 	src/timeb.cpp				\
 	src/ts_string.cpp			\
 	src/winmain.cpp				\
-	src/winsock_extras.cpp
+	src/winsock_extras.cpp	\
+	src/utime.cpp	\
+	src/direct.c	\
+	src/conio.c	\
 
 !IF "$(WCEVERSION)"=="211"
 SRC =							\

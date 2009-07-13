@@ -23,7 +23,7 @@
 #define __wcecompat__pipe_h__
 
 
-#include <windows.h>
+#include <winsock2.h>
 
 
 #ifdef __cplusplus

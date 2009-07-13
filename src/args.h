@@ -23,7 +23,7 @@
 #define __wcecompat__ARGS_H__
 
 
-#include <windows.h>
+#include <winsock2.h>
 
 
 // generate argc/argv from program name and lpCmdLine

@@ -19,7 +19,7 @@
  */
 
 
-#include <windows.h>
+#include <winsock2.h>
 #include "args.h"
 #include "redir.h"	// initStdHandles
 

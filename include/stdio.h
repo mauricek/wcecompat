@@ -167,7 +167,13 @@ void perror(const char *prefix);
 #ifndef _IONBF
 #define _IONBF	2
 #endif
-int setvbuf(FILE* stream, char* buffer, int mode, size_t size);
+
+#ifndef FILENAME_MAX
+#define FILENAME_MAX 260
+#endif
+
+int setbuf (FILE* stream, char* buffer);
+int setvbuf(FILE *stream, char *buffer, int mode, size_t size);
 
 #ifdef __cplusplus
 }

@@ -22,29 +22,38 @@
 #ifndef __wcecompat__IO_H__
 #define __wcecompat__IO_H__
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include <stdio.h>
 
-int __cdecl _access(const char *pathname, int mode);
-int __cdecl _open(const char* filename, int flags, int mode);
-int __cdecl _wopen(const unsigned short* filename, int flags, int mode);
-int __cdecl _close(int fd);
-long __cdecl _lseek(int fd, long offset, int whence);
-int __cdecl _read(int fd, void *buffer, unsigned int count);
-int __cdecl _write(int fd, const void *buffer, unsigned int count);
-int __cdecl _unlink(const char *pathname);
-#define access _access
-#define open _open
-#define wopen _wopen
-#define close _close
-#define lseek _lseek
-#define read _read
-#define write _write
-#define unlink _unlink
+int __cdecl _wceaccess(const char *pathname, int mode);
+int __cdecl _wceunlink(const char *pathname);
+int __cdecl _wcerename(const char *oldname, const char *newname);
+int _wceopen(const char *file, int mode, int pmode);
+int _wceread(int fd, void *buffer, int length);
+int _wcewrite(int fd, const void *buffer, unsigned count);
+long _wcelseek(int handle, long offset, int origin);
+int _wceclose (int fd);
+FILE* _wcefdopen( int handle, const char *mode );
 
+#define access _wceaccess
+#define open _wceopen
+#define _open _wceopen
+#define close _wceclose
+#define read _wceread
+#define write _wcewrite
+#define lseek _wcelseek
+#define _lseek _wcelseek
+#define unlink _wceunlink
+#ifdef rename
+#undef rename
+#endif
+#define rename _wcerename
+#define _rename _wcerename
+#define fdopen _wcefdopen
+#define _fdopen _wcefdopen
 
 #ifdef __cplusplus
 }

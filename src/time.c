@@ -20,11 +20,48 @@
 
 
 #include <time.h>
+#include "sys/timeb.h"
 #include <stdio.h>
-#include <windows.h>
+#include <winsock2.h>
 #include <errno.h>
 #include "internal.h"
 
+// Contains the time zone string
+//
+char tz_name[2][32];
+
+static const FILETIME	ftJan1970 = {3577643008,27111902};
+
+static struct tm st_tm;
+
+// Contains the days of the week abreviation
+//
+static char *aday[] = {
+	"", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+};
+
+// Contains the days of the week full name
+//
+static char *day[] = {
+	"", "Sunday", "Monday", "Tuesday", "Wednesday",
+	"Thursday", "Friday", "Saturday"
+};
+
+// Contains the months of the year abreviation
+//
+static char *amonth[] = {
+	"", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+};
+
+// Contains the months of the year full name
+//
+static char *month[] = {
+	"", "January", "February", "March", "April", "May", "June",
+	"July", "August", "September", "October", "November", "December"
+};
+
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
 
 // Compare two 64-bit values.
 // Returns:
@@ -392,10 +429,6 @@ static void div64(ULARGE_INTEGER* value, DWORD divisor)
 	value->LowPart = result.LowPart;
 }
 
-
-static const FILETIME	ftJan1970 = {3577643008,27111902};
-
-
 // Convert Win32 FILETIME into time_t
 time_t w32_filetime_to_time_t(FILETIME* ft)
 {
@@ -431,6 +464,7 @@ time_t time(time_t* t)
 
 	// get system time
 	GetSystemTime(&stNow);
+	stNow.wMilliseconds = 500;
 	if (!SystemTimeToFileTime(&stNow, &ftNow))
 	{
 		errno = -1;
@@ -450,6 +484,16 @@ clock_t clock(void)
 	return (clock_t)GetTickCount();
 }
 
+
+void UnixTimeToFileTime(time_t t, LPFILETIME pft)
+{
+	// Note that LONGLONG is a 64-bit value
+	LONGLONG ll;
+
+	ll = Int32x32To64(t, 10000000) + 116444736000000000;
+	pft->dwLowDateTime = (DWORD)ll;
+	pft->dwHighDateTime = ll >> 32;
+}
 
 // Returns to day of the year (0..365)
 // Year: eg. 2001
@@ -490,10 +534,6 @@ int dayOfYear(int year, int month, int day)
 	return result;
 }
 
-
-static struct tm st_tm;
-
-
 struct tm* localtime(const time_t* clock)
 {
 	FILETIME				ftUtc;
@@ -506,19 +546,17 @@ struct tm* localtime(const time_t* clock)
 		return NULL;
 
 	// convert time_t to FILETIME
-	ftUtc.dwHighDateTime = 0;
-	ftUtc.dwLowDateTime = *clock;
-	mul64((ULARGE_INTEGER*)&ftUtc, 10000000);
-	add64((ULARGE_INTEGER*)&ftUtc, (ULARGE_INTEGER*)&ftJan1970);
-
+	UnixTimeToFileTime(*clock,&ftUtc);
+	
 	// convert to local FILETIME
-	if (!LocalFileTimeToFileTime(&ftUtc, &ftLocal))
+	if (!FileTimeToLocalFileTime(&ftUtc, &ftLocal))
 		return NULL;
 
 	// convert to SYSTEMTIME
 	if (!FileTimeToSystemTime(&ftLocal, &stLocal))
 		return NULL;
-
+	stLocal.wMilliseconds = 500;
+	
 	// determine if we're operating in daylight savings time
 	tziResult = GetTimeZoneInformation(&tzi);
 
@@ -527,8 +565,8 @@ struct tm* localtime(const time_t* clock)
 	st_tm.tm_min = stLocal.wMinute;
 	st_tm.tm_hour = stLocal.wHour;
 	st_tm.tm_mday = stLocal.wDay;
-	st_tm.tm_mon = stLocal.wMonth-1;
-	st_tm.tm_year = stLocal.wYear-1900;
+	st_tm.tm_mon = stLocal.wMonth;
+	st_tm.tm_year = stLocal.wYear;
 	st_tm.tm_wday = stLocal.wDayOfWeek;
 	st_tm.tm_yday = dayOfYear(stLocal.wYear, stLocal.wMonth-1, stLocal.wDay);
 	if (tziResult == TIME_ZONE_ID_UNKNOWN)
@@ -544,37 +582,270 @@ struct tm* localtime(const time_t* clock)
 
 struct tm* gmtime(const time_t* clock)
 {
-	FILETIME	ftLocal;
 	FILETIME	ftUtc;
-	SYSTEMTIME	stUtc;
+	SYSTEMTIME stUtc;
 
 	if (clock == NULL)
 		return NULL;
 
 	// convert time_t to FILETIME
-	ftLocal.dwHighDateTime = 0;
-	ftLocal.dwLowDateTime = *clock;
-	mul64((ULARGE_INTEGER*)&ftLocal, 10000000);
-	add64((ULARGE_INTEGER*)&ftLocal, (ULARGE_INTEGER*)&ftJan1970);
-
-	// convert to UTC FILETIME
-	if (!LocalFileTimeToFileTime(&ftLocal, &ftUtc))
-		return NULL;
+	UnixTimeToFileTime(*clock,&ftUtc);
 
 	// convert to SYSTEMTIME
 	if (!FileTimeToSystemTime(&ftUtc, &stUtc))
 		return NULL;
 
+	stUtc.wMilliseconds = 500;
 	// fill return structure
 	st_tm.tm_sec = stUtc.wSecond;
 	st_tm.tm_min = stUtc.wMinute;
 	st_tm.tm_hour = stUtc.wHour;
 	st_tm.tm_mday = stUtc.wDay;
-	st_tm.tm_mon = stUtc.wMonth-1;
-	st_tm.tm_year = stUtc.wYear-1900;
+	st_tm.tm_mon = stUtc.wMonth;
+	st_tm.tm_year = stUtc.wYear;
 	st_tm.tm_wday = stUtc.wDayOfWeek;
 	st_tm.tm_yday = dayOfYear(stUtc.wYear, stUtc.wMonth-1, stUtc.wDay);
 	st_tm.tm_isdst = 0;
 
 	return &st_tm;
+
+}
+
+// static void strfmt(char *str, char *fmt);
+// 
+// simple sprintf for strftime
+// 
+// each format descriptor is of the form %n
+// where n goes from zero to four
+// 
+// 0    -- string %s
+// 1..4 -- int %?.?d
+// 
+static void strfmt(char *str, const char *fmt, ...)
+{
+	int ival, ilen;
+	char *sval;
+	static int pow[5] = { 1, 10, 100, 1000, 10000 };
+	va_list vp;
+
+	va_start(vp, fmt);
+	while (*fmt)
+	{
+		if (*fmt++ == '%')
+		{
+			ilen = *fmt++ - '0';
+			if (ilen == 0)                // zero means string arg
+			{
+				sval = va_arg(vp, char*);
+				while (*sval)
+					*str++ = *sval++;
+			}
+			else                          // always leading zeros
+			{
+				ival = va_arg(vp, int);
+				while (ilen)
+				{
+					ival %= pow[ilen--];
+					*str++ = (char)('0' + ival / pow[ilen]);
+				}
+			}
+		}
+		else  *str++ = fmt[-1];
+	}
+	*str = '\0';
+	va_end(vp);
+}
+
+size_t strftime(char *s, size_t maxs, const char *f, const struct tm *t)
+{
+	int			w;
+	char		*p, *q, *r;
+	static char	buf[26];
+
+	p = s;
+	q = s + maxs - 1;
+	while ((*f != '\0'))
+	{
+		if (*f++ == '%')
+		{
+			r = buf;
+			switch (*f++)
+			{
+			case '%' :
+				r = "%";
+				break;
+
+			case 'a' :
+				r = aday[t->tm_wday];
+				break;
+
+			case 'A' :
+				r = day[t->tm_wday];
+				break;
+
+			case 'b' :
+				r = amonth[t->tm_mon];
+				break;
+
+			case 'B' :
+				r = month[t->tm_mon];
+				break;
+
+			case 'c' :
+				strfmt(r, "%0 %0 %2 %2:%2:%2 %4",
+					aday[t->tm_wday], amonth[t->tm_mon],
+					t->tm_mday,t->tm_hour, t->tm_min,
+					t->tm_sec, t->tm_year);
+				break;
+
+			case 'd' :
+				strfmt(r,"%2",t->tm_mday);
+				break;
+
+			case 'H' :
+				strfmt(r,"%2",t->tm_hour);
+				break;
+
+			case 'I' :
+				strfmt(r,"%2",(t->tm_hour%12)?t->tm_hour%12:12);
+				break;
+
+			case 'j' :
+				strfmt(r,"%3",t->tm_yday);
+				break;
+
+			case 'm' :
+				strfmt(r,"%2",t->tm_mon);
+				break;
+
+			case 'M' :
+				strfmt(r,"%2",t->tm_min);
+				break;
+
+			case 'p' :
+				r = (t->tm_hour>11)?"PM":"AM";
+				break;
+
+			case 'S' :
+				strfmt(r,"%2",t->tm_sec);
+				break;
+
+			case 'U' :
+				w = t->tm_yday/7;
+				if (t->tm_yday%7 > t->tm_wday)
+					w++;
+				strfmt(r, "%2", w);
+				break;
+
+			case 'W' :
+				w = (t->tm_yday + DAYSPERWEEK -
+					(t->tm_wday ?
+					(t->tm_wday - 1) :
+				(DAYSPERWEEK - 1))) / DAYSPERWEEK;
+				strfmt(r, "%2", w);
+				break;
+
+			case 'w' :
+				strfmt(r,"%1",t->tm_wday);
+				break;
+
+			case 'x' :
+				strfmt(r, "%2/%2/%2", t->tm_mon,
+					t->tm_mday, t->tm_year);
+				break;
+
+			case 'X' :
+				strfmt(r, "%2:%2:%2", t->tm_hour,
+					t->tm_min, t->tm_sec);
+				break;
+
+			case 'y' :
+				strfmt(r,"%2",t->tm_year%100);
+				break;
+
+			case 'Y' :
+				strfmt(r,"%4",t->tm_year);
+				break;
+
+			case 'Z' :
+				r = (t->tm_isdst && tz_name[1][0])?tz_name[1]:tz_name[0];
+				break;
+
+			default:
+				buf[0] = '%';		// reconstruct the format
+				buf[1] = f[-1];
+				buf[2] = '\0';
+				if (buf[1] == 0)
+					f--;			// back up if at end of string
+			}
+			while (*r)
+			{
+				if (p == q)
+				{
+					*q = '\0';
+					return 0;
+				}
+				*p++ = *r++;
+			}
+		}
+		else
+		{
+			if (p == q)
+			{
+				*q = '\0';
+				return 0;
+			}
+			*p++ = f[-1];
+		}
+	}
+	*p = '\0';
+	return p - s;
+}
+
+time_t mktime(struct tm* pt)
+{
+	SYSTEMTIME ss, ls, s;
+	FILETIME   sf, lf, f;
+	__int64 diff;
+
+	GetSystemTime(&ss);
+	GetLocalTime(&ls);
+	SystemTimeToFileTime( &ss, &sf );
+	SystemTimeToFileTime( &ls, &lf );
+
+	diff = (wce_FILETIME2int64(lf)-wce_FILETIME2int64(sf))/_onesec_in100ns;
+
+	s = wce_tm2SYSTEMTIME(pt);
+	SystemTimeToFileTime( &s, &f );
+	return wce_FILETIME2time_t(&f) - (time_t)diff;
+}
+
+void _tzset ()
+{
+
+}
+
+int gettimeofday(struct timeval *tv, struct timezone *tz)
+{
+	FILETIME ft;
+	unsigned __int64 tmpres = 0;
+	SYSTEMTIME ls;
+	if (NULL != tv)
+	{
+		GetLocalTime(&ls); /// or GetSystemTime should be used here ?!
+		ls.wMilliseconds = 500;
+		SystemTimeToFileTime( &ls, &ft );
+
+		tmpres |= ft.dwHighDateTime;
+		tmpres <<= 32;
+		tmpres |= ft.dwLowDateTime;
+
+		/*converting file time to unix epoch*/
+		tmpres /= 10;  /*convert into microseconds*/
+		tmpres -= DELTA_EPOCH_IN_MICROSECS; 
+		tv->tv_sec = (long)(tmpres / 1000000UL);
+		tv->tv_usec = (long)(tmpres % 1000000UL);
+	}
+
+	return 0;
 }

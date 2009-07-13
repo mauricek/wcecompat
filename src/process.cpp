@@ -20,7 +20,7 @@
 
 
 #include <process.h>
-#include <windows.h>
+#include <winsock2.h>
 
 
 int __cdecl _getpid(void)

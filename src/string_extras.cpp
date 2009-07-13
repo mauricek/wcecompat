@@ -21,6 +21,8 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 
 char* messages[] = {
 /*0           */    "No error",
@@ -75,4 +77,13 @@ char* strerror(int errnum)
 	if (errnum < NUM_MESSAGES)
 		return messages[errnum];
 	return "Unknown error";
+}
+
+char *strdup(const char *Src)
+{
+	char* buffer;
+	buffer = (char*)malloc(strlen(Src)+1);
+	if(buffer)
+		strcpy(buffer, Src);
+	return buffer;
 }

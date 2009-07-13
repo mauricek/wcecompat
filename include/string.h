@@ -94,6 +94,13 @@ _CRTIMP char *  __cdecl _strrev(char *);
 char *  __cdecl _strset(char *, int);
 _CRTIMP char *  __cdecl _strlwr(char *);
 _CRTIMP char *  __cdecl _strupr(char *);
+_CRTIMP char * __cdecl strdup(const char * _Src);
+#ifndef strncasecmp
+#define strncasecmp _strnicmp
+#endif
+#ifndef strcasecmp
+#define strcasecmp _stricmp
+#endif
 
 #ifdef __cplusplus
 }

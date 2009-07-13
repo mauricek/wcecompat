@@ -31,12 +31,16 @@ void perror(const char *prefix)
 		fprintf(stderr, "%s: errno=%d\n", prefix, errno);
 }
 
-
 #if _WIN32_WCE < 0x500 || !defined(COREDLL_CORESTRA)
-int setvbuf(FILE* /*stream*/, char* /*buffer*/, int /*mode*/, size_t /*size*/)
+// int setvbuf(FILE* /*stream*/, char* /*buffer*/, int /*mode*/, size_t /*size*/)
+// {
+// 	// TODO: implement buffering
+// 	return 0;
+// }
+#endif
+int setbuf (FILE* stream, char* buffer)
 {
-	// TODO: implement buffering
+	/// unimplemented, use vbuf. just for compatibility.
 	return 0;
 }
-#endif
 

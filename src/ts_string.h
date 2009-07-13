@@ -24,7 +24,7 @@
 
 
 #include <string.h>
-#include <windows.h>
+#include <winsock2.h>
 
 
 void ascii2unicode(const char* ascii, WCHAR* unicode);
