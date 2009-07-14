@@ -530,11 +530,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\process.cpp"
+				RelativePath=".\src\process.c"
 				>
 			</File>
 			<File
 				RelativePath=".\src\redir.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\signal.c"
 				>
 			</File>
 			<File
@@ -697,6 +701,10 @@
 			</File>
 			<File
 				RelativePath=".\include\string.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\strings.h"
 				>
 			</File>
 			<File

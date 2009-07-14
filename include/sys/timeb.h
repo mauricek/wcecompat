@@ -36,6 +36,7 @@ struct timeb
 	short			timezone;
 	short			dstflag;
 };
+#define _timeb timeb
 
 static __int64 _onesec_in100ns = (__int64)10000000;
 int __cdecl _ftime(struct timeb *tp);

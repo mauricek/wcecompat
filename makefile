@@ -10,7 +10,8 @@ SRC =							\
 	src/errno.cpp				\
 	src/io.c						\
 	src/pipe.cpp				\
-	src/process.cpp				\
+	src/process.c				\
+	src/signal.c				\
 #	src/redir.cpp				\
 	src/stat.cpp				\
 	src/stdio_extras.cpp		\

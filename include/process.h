@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 
-int __cdecl _getpid(void);
+int _getpid(void);
 #define getpid _getpid
 
 __inline unsigned long _beginthreadex( void *security, unsigned stack_size, void* start_address , void *arglist, unsigned initflag, unsigned *thrdaddr ) 

@@ -22,8 +22,7 @@
 #include <process.h>
 #include <winsock2.h>
 
-
-int __cdecl _getpid(void)
+int _getpid(void)
 {
 	return (int)GetCurrentProcessId();
 }

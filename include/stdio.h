@@ -48,7 +48,7 @@ extern "C" {
 
 // FILE is an opaque handle in Win CE. Users have no access to the internals
 #ifndef _FILE_DEFINED
-typedef void FILE;
+typedef unsigned char FILE;
 #define _FILE_DEFINED
 #endif
 
