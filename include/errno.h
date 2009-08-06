@@ -150,10 +150,6 @@ extern int errno;
 #define STRUNCATE       80
 #endif
 
-#ifndef ERANGE
-#define ERANGE  (34)
-#endif
-
 #ifdef __cplusplus
 }
 #endif
