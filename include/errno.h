@@ -53,6 +53,10 @@ extern int errno;
 #define EACCES  (13)
 #endif
 
+#ifndef ERANGE
+#define ERANGE  (34)
+#endif
+
 #ifdef __cplusplus
 }
 #endif
