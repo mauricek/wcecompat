@@ -27,10 +27,15 @@
 extern "C" {
 #endif
 
+struct servent {
+    char* s_name;
+    char** s_aliases;
+    short int s_port;
+    char* s_proto;
+} servent;
 
-#include <winsock2.h>
+struct servent* getservbyname(const char* name, const char* proto);
 
-struct servent* PASCAL getservbyname(const char* name, const char* proto);
 
 
 #ifdef __cplusplus

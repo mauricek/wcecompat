@@ -20,6 +20,7 @@
 
 #include <winsock_extras.h>
 #include <stdio.h>
+#include <string.h>
 
 struct sserv{
         short num;
